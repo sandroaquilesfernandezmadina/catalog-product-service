@@ -9,8 +9,8 @@ import java.util.List;
 public interface ProductService {
 
     List<ProductResponse> findAll();
-    ProductResponse findById(Long id);
+    ProductResponse findById(Integer id);
     ProductResponse save (ProductRequest request);
-    ProductResponse update (Long id, ProductRequest request);
-    public void delete(Long id);
+    ProductResponse update (Integer id, ProductRequest request);
+    public void delete(Integer id);
 }

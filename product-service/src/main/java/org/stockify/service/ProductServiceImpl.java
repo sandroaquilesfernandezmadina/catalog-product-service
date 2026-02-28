@@ -2,9 +2,11 @@ package org.stockify.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.stockify.Entity.Product;
 import org.stockify.Repository.ProductRepository;
 import org.stockify.dto.ProductRequest;
 import org.stockify.dto.ProductResponse;
+import org.stockify.exeption.ResourceNotFountExeption;
 import org.stockify.mapper.ProductMapper;
 
 import java.util.List;
@@ -27,22 +29,38 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse findById(Long id) {
-        return null;
+    public ProductResponse findById(Integer id) {
+        Product  product = productRepository.findById(id)
+                .orElseThrow(()->
+                      new ResourceNotFountExeption("Producto no encontrado con el id: " + id));
+
+
+        return productMapper.toResponse(product);
     }
 
     @Override
     public ProductResponse save(ProductRequest request) {
-        return null;
+        Product product = productMapper.toEntity(request);
+        Product guardado = productRepository.save(product);
+        return productMapper.toResponse(guardado);
     }
 
     @Override
-    public ProductResponse update(Long id, ProductRequest request) {
-        return null;
+    public ProductResponse update(Integer id, ProductRequest request) {
+        Product  product = productRepository.findById(id)
+                .orElseThrow(()->
+                        new ResourceNotFountExeption("Producto no encontrado con el id: " + id));
+
+         product.setNombre(request.getNombre());
+         product.setDescripcion(request.getDescricion());
+         product.setPrecio(request.getPrecio());
+
+         Product actualizado = productRepository.save(product);
+        return productMapper.toResponse(actualizado);
     }
 
     @Override
-    public void delete(Long id) {
-
+    public void delete(Integer id) {
+        productRepository.deleteById(id);
     }
 }
