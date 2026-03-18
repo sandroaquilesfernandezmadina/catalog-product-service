@@ -1,0 +1,71 @@
+services:
+
+  mysql-product-db:
+    image: mysql:8.0
+    container_name: mysql-product-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product_db
+    ports:
+      - "3307:3306"
+    networks:
+      - microservices-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    depends_on:
+       config-server:
+         condition: service_healthy
+       eureka-server:
+         condition: service_started
+       mysql-product-db:
+         condition: service_started
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

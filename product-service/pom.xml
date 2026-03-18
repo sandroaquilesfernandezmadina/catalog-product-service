@@ -42,7 +42,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-
         <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

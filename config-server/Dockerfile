@@ -16,6 +16,11 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
+# 🔥 AGREGA ESTO
+RUN apk add --no-cache curl
+
 COPY --from=builder /workspace/target/*.jar app.jar
+
+EXPOSE 8888
 
 ENTRYPOINT ["java","-jar","app.jar"]
